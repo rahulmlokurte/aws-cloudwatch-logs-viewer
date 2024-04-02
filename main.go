@@ -12,9 +12,14 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const (
-	folder_name = "query_folder_name"
-)
+var folder_name string = "replace_folder_to_search"
+
+var style = lipgloss.NewStyle().
+	Bold(true).
+	Foreground(lipgloss.Color("#ea76cb")).
+	PaddingTop(1).
+	Italic(true).
+	PaddingLeft(4)
 
 var rootCmd = &cobra.Command{
 	Use:   "aclv",
@@ -74,7 +79,9 @@ func listSavedQueries() {
 
 	svc := cloudwatchlogs.NewFromConfig(cfg)
 
-	input := &cloudwatchlogs.DescribeQueryDefinitionsInput{}
+	input := &cloudwatchlogs.DescribeQueryDefinitionsInput{
+		QueryDefinitionNamePrefix: &folder_name,
+	}
 
 	result, err := svc.DescribeQueryDefinitions(context.TODO(), input)
 	if err != nil {
@@ -82,16 +89,36 @@ func listSavedQueries() {
 		return
 	}
 
-	var output strings.Builder
-	output.WriteString(strings.TrimSpace(lipgloss.NewStyle().Foreground(lipgloss.Color("#FFCC00")).Render("Saved Queries in " + folder_name + " folder:\n")))
-	for _, queries := range result.QueryDefinitions {
+	folders := make(map[string]string)
+
+	for index, queries := range result.QueryDefinitions {
 		if strings.HasPrefix(*queries.Name, folder_name) {
-			styledName := lipgloss.NewStyle().Foreground(lipgloss.Color("#36C5F0")).PaddingLeft(4).Italic(true).Render(*queries.Name)
-			output.WriteString(styledName + "\n")
+			folderName := *queries.Name
+			folders[fmt.Sprintf("%d", index+1)] = folderName
+			fmt.Printf("%d. %s\n", index+1, folderName)
 		}
 
 	}
-	fmt.Print(output.String())
+
+	// Prompt user to select a folder
+	var selectedFolder string
+	fmt.Print(lipgloss.NewStyle().Foreground(lipgloss.Color("#eed49f")).PaddingTop(1).Render("Select the query: "))
+	fmt.Scanln(&selectedFolder)
+
+	// Retrieve queries within the selected folder
+	selectedFolderName, ok := folders[selectedFolder]
+	if !ok {
+		fmt.Println("Invalid folder index.")
+		return
+	}
+
+	fmt.Print(lipgloss.NewStyle().Foreground(lipgloss.Color("#a6da95")).Padding(1).Italic(true).Render("You have selected " + selectedFolderName))
+
+	for _, q := range result.QueryDefinitions {
+		if strings.HasPrefix(*q.Name, selectedFolderName) {
+			fmt.Println(style.Render(*q.QueryString))
+		}
+	}
 
 }
 
