@@ -12,12 +12,13 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var folder_name string = "replace_folder_to_search"
+var folder_name string = "Devfi"
 
 var style = lipgloss.NewStyle().
 	Bold(true).
+	BorderStyle(lipgloss.NormalBorder()).
+	BorderForeground(lipgloss.Color("#f4dbd6")).
 	Foreground(lipgloss.Color("#ea76cb")).
-	PaddingTop(1).
 	Italic(true).
 	PaddingLeft(4)
 
@@ -112,7 +113,7 @@ func listSavedQueries() {
 		return
 	}
 
-	fmt.Print(lipgloss.NewStyle().Foreground(lipgloss.Color("#a6da95")).Padding(1).Italic(true).Render("You have selected " + selectedFolderName))
+	fmt.Println(lipgloss.NewStyle().Foreground(lipgloss.Color("#a6da95")).Padding(1).Italic(true).Render("You have selected " + selectedFolderName))
 
 	for _, q := range result.QueryDefinitions {
 		if strings.HasPrefix(*q.Name, selectedFolderName) {
