@@ -12,8 +12,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var folder_name string = "Devfi"
-
 var style = lipgloss.NewStyle().
 	Bold(true).
 	BorderStyle(lipgloss.NormalBorder()).
@@ -33,6 +31,7 @@ var rootCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(logGroupsCmd)
 	rootCmd.AddCommand(savedQueriesCmd)
+	savedQueriesCmd.PersistentFlags().StringP("startsWith", "f", "", "Queries starting with a name example: test")
 }
 
 var logGroupsCmd = &cobra.Command{
@@ -44,10 +43,12 @@ var logGroupsCmd = &cobra.Command{
 }
 
 var savedQueriesCmd = &cobra.Command{
-	Use:   "saved-queries",
-	Short: "List CloudWatch saved queries",
+	Use:     "saved-queries",
+	Short:   "List CloudWatch saved queries",
+	Aliases: []string{"sq"},
 	Run: func(cmd *cobra.Command, args []string) {
-		listSavedQueries()
+		folder_name, _ := cmd.Flags().GetString("startsWith")
+		listSavedQueries(folder_name)
 	},
 }
 
@@ -71,7 +72,7 @@ func listLogGroups() {
 	}
 }
 
-func listSavedQueries() {
+func listSavedQueries(folder_name string) {
 	cfg, err := config.LoadDefaultConfig(context.TODO())
 	if err != nil {
 		fmt.Println("Error loading AWS configuration:", err)
@@ -80,8 +81,13 @@ func listSavedQueries() {
 
 	svc := cloudwatchlogs.NewFromConfig(cfg)
 
-	input := &cloudwatchlogs.DescribeQueryDefinitionsInput{
-		QueryDefinitionNamePrefix: &folder_name,
+	var input *cloudwatchlogs.DescribeQueryDefinitionsInput
+	if len(folder_name) > 0 {
+		input = &cloudwatchlogs.DescribeQueryDefinitionsInput{
+			QueryDefinitionNamePrefix: &folder_name,
+		}
+	} else {
+		input = &cloudwatchlogs.DescribeQueryDefinitionsInput{}
 	}
 
 	result, err := svc.DescribeQueryDefinitions(context.TODO(), input)
@@ -103,13 +109,13 @@ func listSavedQueries() {
 
 	// Prompt user to select a folder
 	var selectedFolder string
-	fmt.Print(lipgloss.NewStyle().Foreground(lipgloss.Color("#eed49f")).PaddingTop(1).Render("Select the query: "))
+	fmt.Print(lipgloss.NewStyle().Foreground(lipgloss.Color("#eed49f")).PaddingTop(1).Italic(true).Blink(true).Render("Select the query number: "))
 	fmt.Scanln(&selectedFolder)
 
 	// Retrieve queries within the selected folder
 	selectedFolderName, ok := folders[selectedFolder]
 	if !ok {
-		fmt.Println("Invalid folder index.")
+		fmt.Println(lipgloss.NewStyle().Foreground(lipgloss.Color("#f38ba8")).PaddingTop(1).Italic(true).Strikethrough(true).Blink(true).Render("Invalid folder index."))
 		return
 	}
 
