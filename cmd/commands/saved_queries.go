@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 	"github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/rahulmlokurte/aclv/pkg/config"
 	"github.com/spf13/cobra"
 	"strings"
 )
@@ -28,7 +28,7 @@ func savedQueriesCmd() *cobra.Command {
 
 func listSavedQueries(cmd *cobra.Command, args []string) {
 	folderName, _ := cmd.Flags().GetString("startsWith")
-	awsConfig := awsLogin()
+	awsConfig := config.AwsLogin()
 	result := queryCloudWatchNames(awsConfig, folderName)
 	queryCloudWatchNamesList(result)
 }
@@ -81,13 +81,4 @@ func queryCloudWatchNames(cfg aws.Config, queryDefinitionName string) *cloudwatc
 		return nil
 	}
 	return result
-}
-
-func awsLogin() aws.Config {
-	cfg, err := config.LoadDefaultConfig(context.TODO())
-	if err != nil {
-		fmt.Println("Error loading AWS configuration:", err)
-		return aws.Config{}
-	}
-	return cfg
 }

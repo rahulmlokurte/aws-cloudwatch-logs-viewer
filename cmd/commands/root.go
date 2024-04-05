@@ -13,6 +13,7 @@ func Execute() {
 	}
 
 	rootCmd.AddCommand(savedQueriesCmd())
+	rootCmd.AddCommand(logGroupsCmd())
 
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)
