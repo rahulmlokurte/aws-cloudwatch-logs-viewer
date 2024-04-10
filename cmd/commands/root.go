@@ -2,8 +2,9 @@ package commands
 
 import (
 	"fmt"
-	"github.com/spf13/cobra"
 	"os"
+
+	"github.com/spf13/cobra"
 )
 
 func Execute() {
@@ -14,6 +15,7 @@ func Execute() {
 
 	rootCmd.AddCommand(savedQueriesCmd())
 	rootCmd.AddCommand(logGroupsCmd())
+	rootCmd.AddCommand(getLogEventsCmd())
 
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)

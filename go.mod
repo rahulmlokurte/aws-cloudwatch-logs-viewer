@@ -3,12 +3,15 @@ module github.com/rahulmlokurte/aclv
 go 1.22.1
 
 require github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.35.1
+
 require github.com/charmbracelet/lipgloss v0.10.0
-require	github.com/aws/aws-sdk-go-v2/config v1.27.10
-require	github.com/spf13/cobra v1.8.0
+
+require github.com/aws/aws-sdk-go-v2/config v1.27.10
+
+require github.com/spf13/cobra v1.8.0
 
 require (
-	github.com/aws/aws-sdk-go-v2 v1.26.1 // indirect
+	github.com/aws/aws-sdk-go-v2 v1.26.1
 	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.6.2 // indirect
 	github.com/aws/aws-sdk-go-v2/credentials v1.17.10 // indirect
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.16.1 // indirect
