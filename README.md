@@ -7,6 +7,7 @@ It provides a simple and intuitive way to list CloudWatch saved queries, select 
 
 - List CloudWatch saved query definition names.
 - Display the actual query stored in the query definition.
+- Support to get the logs given a Log Stream Name.
 
 ## Installation
 
